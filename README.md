@@ -1,7 +1,7 @@
 # Network-Topology-Visualisation-with-vis.js
 This is a exampe of visualisation a network topology with the vis.js framwork.
 for using this example just clone the repo switch into the src folder and open the
-index.html file.<br>
+index.html file.<br><br><br>
 ![alt text](./screenshots/PictureofVisualisation.png "Description goes here")<br>
 ![alt text](./screenshots/PictureofVisualisationMenu.png "Description goes here")
 
