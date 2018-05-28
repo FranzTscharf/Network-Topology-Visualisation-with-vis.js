@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>MockFog</title>
+    <link rel="stylesheet" href="./vendor/simple-line-icons/css/simple-line-icons.css">
+    <link rel="stylesheet" href="./vendor/font-awesome/css/fontawesome-all.min.css">
+    <link rel="stylesheet" href="./css/styles.css">
+    <link href="./vendor/vis.js/vis-network.min.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="./vendor/vis.js/vis.js"></script>
+    <script type="text/javascript" src="./js/nodeEditor.js"></script>
+    <style type="text/css">
+        canvas{
+            height: 100%;
+            width: 100%;
+            min-height: 400px;
+        }
+        /*  Reset icons start*/
+        div.vis-network div.vis-manipulation {
+            background: none;
+            border-bottom: none;
+            /*border-bottom-color: #787878;*/
+        }
+        div.vis-network div.vis-manipulation div.vis-button.vis-add {
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif;
+            background-image: url(./vendor/vis.js/img/bar/addNodeIcon.svg);
+            background-size: 26px;
+            border-radius: unset;
+        }
+        div.vis-network div.vis-edit-mode div.vis-button.vis-edit, div.vis-network div.vis-manipulation div.vis-button.vis-edit {
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif;
+            background-image: url(./vendor/vis.js/img/bar/editIcon.svg);
+            background-size: 33px;
+            border-radius: unset;
+        }
+        div.vis-network div.vis-manipulation div.vis-button.vis-back {
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif;
+            background-image: url(./vendor/vis.js/img/bar/backIcon.svg);
+            background-size: 26px;
+            border-radius: unset;
+        }
+        div.vis-network div.vis-manipulation div.vis-button.vis-connect {
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif;
+            background-image: url(./vendor/vis.js/img/bar/addEdgeIcon.svg);
+            background-size: 26px;
+            border-radius: unset;
+        }
+        div.vis-network div.vis-manipulation div.vis-button.vis-delete {
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif;
+            background-image: url(./vendor/vis.js/img/bar/deleteIcon.svg);
+            background-size: 26px;
+            border-radius: unset;
+        }
+        /*  Reset icons end*/
+        div.vis-network div.vis-edit-mode div.vis-button, div.vis-network div.vis-manipulation div.vis-button {
+            height: 31px;
+            margin-left: 16px;
+        }
+        div.vis-network div.vis-edit-mode div.vis-label, div.vis-network div.vis-manipulation div.vis-label {
+            margin: 2px 0 14px 23px;
+            line-height: 25px;
+        }
+        /*  Node editor popup windows css settings*/
+        #node-popUp {
+            display:none;
+            position:absolute;
+            top:350px;
+            left:170px;
+            z-index:299;
+            width:250px;
+            height:120px;
+            background-color: #f9f9f9;
+            border-style:solid;
+            border-width:3px;
+            border-color: #000;
+            padding:10px;
+            text-align: center;
+        }
+        #edge-popUp {
+            display:none;
+            position:absolute;
+            top:350px;
+            left:170px;
+            z-index:299;
+            width:250px;
+            height:90px;
+            background-color: #f9f9f9;
+            border-style:solid;
+            border-width:3px;
+            border-color: #000;
+            padding:10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body class="sidebar-fixed header-fixed" onload="draw()">
+<div class="page-wrapper">
+    <nav class="navbar page-header" style="border-bottom: 1px solid #b3b3b3;background-color: #fafafa5c;">
+        <a href="#" class="btn btn-link sidebar-mobile-toggle d-md-none mr-auto">
+            <i class="fa fa-bars"></i>
+        </a>
+
+        <!--
+        <a class="navbar-brand" href="#" style="width: calc(230px - 1rem);">
+            <img src="./imgs/mockfog_logo.svg" style="width: 150px;" alt="logo">
+        </a>
+        !--->
+
+        <a href="#" class="btn btn-link sidebar-toggle d-md-down-none">
+            <i class="fa fa-bars"></i>
+        </a>
+
+        <ul class="navbar-nav ml-auto">
+
+            <!--
+            <li class="nav-item d-md-down-none">
+                <a href="#">
+                    <i class="fa fa-bell"></i>
+                    <span class="badge badge-pill badge-danger">5</span>
+                </a>
+            </li>
+
+            <li class="nav-item d-md-down-none">
+                <a href="#">
+                    <i class="fa fa-envelope-open"></i>
+                    <span class="badge badge-pill badge-danger">5</span>
+                </a>
+            </li>
+            !-->
+
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
+                   aria-expanded="false">
+                    <img src="./imgs/avatar-1.png" class="avatar avatar-sm" alt="logo">
+                    <span class="small ml-1 d-md-down-none">John Smith</span>
+                </a>
+
+                <div class="dropdown-menu dropdown-menu-right">
+                    <div class="dropdown-header">Account</div>
+
+                    <a href="#" class="dropdown-item">
+                        <i class="fa fa-user"></i> Profile
+                    </a>
+
+                    <a href="#" class="dropdown-item">
+                        <i class="fa fa-envelope"></i> Messages
+                    </a>
+
+                    <div class="dropdown-header">Settings</div>
+
+                    <a href="#" class="dropdown-item">
+                        <i class="fa fa-bell"></i> Notifications
+                    </a>
+
+                    <a href="#" class="dropdown-item">
+                        <i class="fa fa-wrench"></i> Settings
+                    </a>
+
+                    <a href="#" class="dropdown-item">
+                        <i class="fa fa-lock"></i> Logout
+                    </a>
+                </div>
+            </li>
+        </ul>
+    </nav>
+    <div class="main-container">
+        <div class="sidebar">
+            <nav class="sidebar-nav">
+                <ul class="nav">
+                    <li class="nav-title">Navigation</li>
+
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link active">
+                            <i class="icon icon-speedometer"></i> Network Topology
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="forms.html" class="nav-link">
+                            <i class="icon icon-puzzle"></i> Forms
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="tables.html" class="nav-link">
+                            <i class="icon icon-grid"></i> Tables
+                        </a>
+                    </li>
+
+                    <li class="nav-title">More</li>
+                    <li class="nav-item">
+                        <a href="forms.html" class="nav-link">
+                            <i class="icon icon-puzzle"></i> Impressum
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="tables.html" class="nav-link">
+                            <i class="icon icon-grid"></i> Credits
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="forms.html" class="nav-link">
+                            <i class="icon icon-puzzle"></i> Contact
+                        </a>
+                    </li>
+
+                </ul>
+            </nav>
+        </div>
+
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row " style="margin-top: -150px;">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-body" style="background-image: url(./imgs/mockfog_logo_Background_scope.png);background-size:cover;">
+                                <img alt="self-Logo" src="./imgs/mockfog_logo.svg" style="width: 80%;height: 80%;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row ">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header bg-light">Network Topology
+                            </div>
+
+                            <div class="card-body p-0">
+                                <div class="p-0" style="margin-left: 16px; margin-top: 8px;">
+                                    <!-- <button class="btn-sm btn-outline-secondary">Save</button> !-->
+                                    <button class="btn btn-outline-secondary">Save</button>
+                                    <button class="btn btn-outline-secondary">Load</button>
+                                    <button class="btn btn-outline-secondary">Reset</button>
+                                    <button class="btn btn-outline-success"><i class="fas fa-play"></i>     Play</button>
+                                </div>
+                                <hr>
+                                <div class="p-0">
+
+                                    <div id="node-popUp">
+                                        <span id="node-operation">node</span> <br>
+                                        <table style="margin:auto;">
+                                            <tbody><tr>
+                                                <td>id</td><td><input id="node-id" value="new value"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>label</td><td><input id="node-label" value="new value"></td>
+                                            </tr>
+                                            <tr>
+                                                <select id="node-type">
+                                                    <option value="internet">Internet</option>
+                                                    <option value="router">Router</option>
+                                                    <option value="subnet">Network</option>
+                                                    <option value="edgeDevice">EdgeDevice</option>
+                                                </select>
+                                            </tr>
+                                            </tbody></table>
+                                        <input type="button" value="save" id="node-saveButton">
+                                        <input type="button" value="cancel" id="node-cancelButton">
+                                    </div>
+                                    <div id="edge-popUp">
+                                        <span id="edge-operation">edge</span> <br>
+                                        <table style="margin:auto;">
+                                            <tbody><tr>
+                                                <td>label</td><td><input id="edge-label" value="new value"></td>
+                                            </tr></tbody></table>
+                                        <input type="button" value="save" id="edge-saveButton">
+                                        <input type="button" value="cancel" id="edge-cancelButton">
+                                    </div>
+
+                                    <div id="mynetwork" style="min-height: 400px"></div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="./vendor/jquery/jquery.min.js"></script>
+<script src="./vendor/popper.js/popper.min.js"></script>
+<script src="./vendor/bootstrap/js/bootstrap.min.js"></script>
+<script src="./vendor/chart.js/chart.min.js"></script>
+<script src="./js/carbon.js"></script>
+<script src="./js/demo.js"></script>
+</body>
+</html>
